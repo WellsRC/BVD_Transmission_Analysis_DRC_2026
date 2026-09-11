@@ -1,0 +1,103 @@
+% clear;
+% clc;
+% N_Samp=10^4;
+% 
+% [k_mle,p_mle,p_fatal_mle,p_non_fatal_mle,cfr_mle,k,p,p_fatal,p_non_fatal,cfr,R0_mle,R0,R0_Fatal_mle,R0_Fatal,R0_Non_fatal_mle,R0_Non_fatal] = BVD_Parameters(N_Samp);
+% 
+% Num_Gen=17;
+% uv = [0.05 0.1:0.1:0.9 0.95];
+% theta_G=zeros(Num_Gen+1,1); 
+% sigma_G_1=zeros(Num_Gen+1,length(uv)); 
+% sigma_G_5=zeros(Num_Gen+1,length(uv)); 
+% sigma_G_10=zeros(Num_Gen+1,length(uv)); 
+% sigma_G_20=zeros(Num_Gen+1,length(uv)); 
+% 
+% theta_G(1)=nbinpdf(0,k_mle,p_mle); % Probability extinct w/ index
+% 
+% for gg=2:Num_Gen+1
+%     theta_G(gg)=p_mle.^k_mle./(1-sum(theta_G(1:(gg-1))).*(1-p_mle)).^k_mle-sum(theta_G(1:(gg-1)));
+% end
+% 
+% parfor uu=1:length(uv)
+%     sigma_G_1(:,uu)=Sample_Approximation_Detection_Chain(Num_Gen,1,uv(uu),k_mle,p_mle);
+%     sigma_G_5(:,uu)=Sample_Approximation_Detection_Chain(Num_Gen,5,uv(uu),k_mle,p_mle);
+%     sigma_G_10(:,uu)=Sample_Approximation_Detection_Chain(Num_Gen,10,uv(uu),k_mle,p_mle);
+%     sigma_G_20(:,uu)=Sample_Approximation_Detection_Chain(Num_Gen,20,uv(uu),k_mle,p_mle);
+% end
+% 
+
+close all;
+
+
+
+pdf_1 =[sigma_G_1(1,:); diff(sigma_G_1,[],1)];
+pdf_1=pdf_1./repmat(sum(pdf_1,1),Num_Gen+1,1);
+pdf_5 =[sigma_G_5(1,:); diff(sigma_G_5,[],1)];
+pdf_5=pdf_5./repmat(sum(pdf_5,1),Num_Gen+1,1);
+pdf_10 =[sigma_G_10(1,:); diff(sigma_G_10,[],1)];
+pdf_10=pdf_10./repmat(sum(pdf_10,1),Num_Gen+1,1);
+pdf_20 =[sigma_G_20(1,:); diff(sigma_G_20,[],1)];
+pdf_20=pdf_20./repmat(sum(pdf_20,1),Num_Gen+1,1);
+
+E_1 = theta_G'*pdf_1;
+E_5 = theta_G'*pdf_5;
+E_10 = theta_G'*pdf_10;
+E_20 = theta_G'*pdf_20;
+
+G_1 = [0:Num_Gen]*pdf_1;
+G_5 = [0:Num_Gen]*pdf_5;
+G_10 = [0:Num_Gen]*pdf_10;
+G_20 = [0:Num_Gen]*pdf_20;
+
+figure('units','normalized','outerposition',[0.05 0.25 0.9 0.45])
+subplot('Position',[0.055 0.13 0.275 0.83])
+C_String={'#bdc9e1'
+'#74a9cf'
+'#2b8cbe'
+'#045a8d'};
+
+C_M=hex2rgb(C_String);
+
+b=bar([1:length(uv)],[E_1; E_5;E_10;E_20]);
+for bb=1:length(b)
+    b(bb).FaceColor=C_M(bb,:);
+end
+box off;
+XTL=cell(length(uv),1);
+for uu=1:length(uv)
+    XTL{uu}=[num2str(100.*uv(uu)) '%'];
+end
+set(gca,'TickDir','out','LineWidth',2,'fontsize',12,'XTick',[1:length(uv)],'XTickLabel',XTL)
+yscale('log')
+xlabel('Underascertainment rate','FontSize',14)
+ylabel('Average probability of extinction','FontSize',14)
+legend({'1 case','5 cases','10 cases','20 cases'})
+legend boxoff;
+theme('light')
+
+subplot('Position',[0.385 0.13 0.275 0.83])
+
+C_String={'#b2e2e2'
+'#66c2a4'
+'#2ca25f'
+'#006d2c'};
+
+C_M=hex2rgb(C_String);
+
+b=bar([1:length(uv)],[G_1; G_5;G_10;G_20]);
+for bb=1:length(b)
+    b(bb).FaceColor=C_M(bb,:);
+end
+box off;
+XTL=cell(length(uv),1);
+for uu=1:length(uv)
+    XTL{uu}=[num2str(100.*uv(uu)) '%'];
+end
+set(gca,'TickDir','out','LineWidth',2,'fontsize',12,'XTick',[1:length(uv)],'XTickLabel',XTL)
+xlabel('Underascertainment rate','FontSize',14)
+ylabel('Average generation of detection','FontSize',14)
+legend({'1 case','5 cases','10 cases','20 cases'},'Location','northwest')
+legend boxoff;
+theme('light')
+
+subplot('Position',[0.385 0.13 0.275 0.83])
