@@ -3,6 +3,8 @@ clc;
 close all;
 
 load('BVD_Model_Fit.mat')
+Model_Cases=cumsum(Model_Cases,2);
+Model_Deaths=cumsum(Model_Deaths,2);
 Generation = Parameters(:,6);
 figure('units','normalized','outerposition',[0.25 0.05 0.5 0.9])
 subplot('Position',[0.1 0.56 0.87 0.42])
@@ -27,8 +29,8 @@ for tt=1:length(Date)
     
 end
 
-   scatter(1:length(Date),Cases,30,hex2rgb('#16253D'),'filled');
-   scatter(1:length(Date),Deaths,30,hex2rgb('#500805'),'filled','Marker','diamond');
+   scatter(1:length(Date),cumsum(Cases),30,hex2rgb('#16253D'),'filled');
+   scatter(1:length(Date),cumsum(Deaths),30,hex2rgb('#500805'),'filled','Marker','diamond');
 set(gca,'LineWidth',2,'TickDir','out','XTick',[1:length(Date)],'XTickLabel',{datestr(Date)},'FontSize',12,'YMinorTick','on')
 ylabel('Cumulative ascertained incidence','FontSize',14)
 xlabel('Date','FontSize',14)
@@ -86,4 +88,4 @@ time_f = edges(1:end-1)+0.5;
 mle = datenum('May 13, 2026') - time_f(find(N==max(N)));
 test_bnds = cumsum(N)./sum(N);
 bnds = datenum('May 13, 2026') -flip(time_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]));
-display(['Date epidemic originated: ' datestr(mle) ' (95% UI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
+display(['Date epidemic originated: ' datestr(mle) ' (95% CrI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);

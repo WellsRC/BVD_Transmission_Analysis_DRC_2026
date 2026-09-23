@@ -1,35 +1,35 @@
 clear;
 clc;
-% if isempty(gcp('nocreate'))
-%     parpool(6);
-% end
-% 
-% load("BVD_Model_Fit.mat",'Parameters')
-% NS=size(Parameters,1);
-% 
-% R0=Parameters(:,1).*(1-Parameters(:,2))./Parameters(:,2);
-% 
-% k=Parameters(:,1);
-% p=Parameters(:,2);
-% u=Parameters(:,4);
-% Num_Gen=15;
-% 
-% 
-% theta_G=zeros(Num_Gen+1,length(k)); 
-% sigma_G_1=zeros(Num_Gen+1,length(k)); 
-% 
-% parfor kk=1:length(k)
-%     theta_G_temp=zeros(Num_Gen+1,1); 
-%     theta_G_temp(1)=nbinpdf(0,k(kk),p(kk)); % Probability extinct w/ index
-% 
-%     for gg=2:Num_Gen+1
-%         theta_G_temp(gg)=p(kk).^k(kk)./(1-sum(theta_G_temp(1:(gg-1))).*(1-p(kk))).^k(kk)-sum(theta_G_temp(1:(gg-1)));
-%     end
-%     theta_G(:,kk)=theta_G_temp;
-%     sigma_G_1(:,kk)=Sample_Approximation_Detection_Chain(Num_Gen,1,u(kk),k(kk),p(kk));
-% end
-% 
-% save('Output_Fig_S5.mat')
+if isempty(gcp('nocreate'))
+    parpool(16);
+end
+
+load("BVD_Model_Fit.mat",'Parameters')
+NS=size(Parameters,1);
+
+R0=Parameters(:,1).*(1-Parameters(:,2))./Parameters(:,2);
+
+k=Parameters(:,1);
+p=Parameters(:,2);
+u=Parameters(:,4);
+Num_Gen=15;
+
+
+theta_G=zeros(Num_Gen+1,length(k)); 
+sigma_G_1=zeros(Num_Gen+1,length(k)); 
+
+parfor kk=1:length(k)
+    theta_G_temp=zeros(Num_Gen+1,1); 
+    theta_G_temp(1)=nbinpdf(0,k(kk),p(kk)); % Probability extinct w/ index
+
+    for gg=2:Num_Gen+1
+        theta_G_temp(gg)=p(kk).^k(kk)./(1-sum(theta_G_temp(1:(gg-1))).*(1-p(kk))).^k(kk)-sum(theta_G_temp(1:(gg-1)));
+    end
+    theta_G(:,kk)=theta_G_temp;
+    sigma_G_1(:,kk)=Sample_Approximation_Detection_Chain(Num_Gen,1,u(kk),k(kk),p(kk),1);
+end
+
+save('Output_Fig_S5.mat')
 
 load('Output_Fig_S5.mat');
 Gen_Det=zeros(1,length(k));

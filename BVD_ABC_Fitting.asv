@@ -1,0 +1,135 @@
+% clear;
+% clc;
+eps_T=[1.2*10^4 1.1*10^4 9.5*10^3 7.5*10^3 5.5*10^3 4*10^3 3*10^3 2.5*10^3 2*10^3 1.75*10^3 1.5*10^3 1.3*10^3 1.2*10^3 1.1*10^3 10^3];
+
+rng(20260720)
+N_Samp = 1000;
+Parameters = zeros(N_Samp,6);
+LSE = zeros(N_Samp,1);
+weight = zeros(1,N_Samp);
+q_Parameter_MAT = ones(N_Samp,6);
+% Used May 29 as May 28 was not available
+% Used June 13 as June 12 was not available
+Date = datenum({'May 13, 2026'; 'May 29, 2026';'June 13, 2026'; 'June 27, 2026'; 'July 12, 2026'; 'July 27, 2026'; 'August 11, 2026'});
+Cases = [246 906+263 906+782 906+1274 906+1963 906+3360 906+4566];
+% Cases = [Cases(1) diff(Cases)];
+Deaths = [80 223+42 223+181 223+360 223+718 223+1487 223+2128];
+% Deaths = [Deaths(1) diff(Deaths)];
+
+Model_Cases = zeros(N_Samp,length(Cases));
+Model_Deaths = zeros(N_Samp,length(Cases));
+
+Model_Cases_Overall = zeros(N_Samp,length(Cases));
+
+Model_Entire_Case = cell(N_Samp,1);
+Model_Entire_Case_Overall = cell(N_Samp,1);
+Model_Entire_Death = cell(N_Samp,1);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Basic Reproduction Number
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+gp_R0 = lsqnonlin(@(x) [1.46 1.68 1.36 1.83 1.24 2.15]-gaminv([0.35 0.65 0.2 0.8 0.05 0.95],x(1),x(2)),[2 2],[0 0],[100 100]);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Case fatality
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% https://epiforecasts.io/BVDOutbreakSize/dev/analysis#Results (Accessed  July 23 2026)
+bp_cfr = lsqnonlin(@(x) [0.44 0.49 0.41 0.53 0.36 0.59]-betainv([0.35 0.65 0.2 0.8 0.05 0.95],x(1),x(2)),[2 2],[0 0],[100 100]);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Dispersion coefficients
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+k_mle =0.27;
+gp_k = lsqnonlin(@(x) [0.2 0.33] -gaminv([0.025 0.975],x(1),k_mle./(x(1)-1)),3,1,100);
+
+
+for jj = 1:length(eps_T)
+    if(jj==1)
+        k_OLD=NaN;
+        p_OLD=NaN;
+        cfr_OLD=NaN;
+        mu_A_OLD=NaN;
+        I0_OLD=NaN;
+        Generation_OLD=NaN;
+        weight_old = NaN;
+    else
+        k_OLD=Parameters(:,1);
+        p_OLD=Parameters(:,2);
+        cfr_OLD=Parameters(:,3);
+        mu_A_OLD=Parameters(:,4);
+        I0_OLD=Parameters(:,5);
+        Generation_OLD=Parameters(:,6);
+        weight_old = weight./sum(weight);
+    end
+
+    q_Parameter_MAT_old = q_Parameter_MAT;
+    for n_sim=1:N_Samp
+        LSE_t = inf;
+        L_Prior=ones(6,1);
+        while(LSE_t>eps_T(jj))
+            [k,p,cfr,mu_A,I0,Generation,q_Parameter_MAT(n_sim,:)]=Sample_BVD_Parameters(k_OLD,p_OLD,cfr_OLD,mu_A_OLD,I0_OLD,Generation_OLD,weight_old);
+            L_Prior(1) = gampdf(k,gp_k(1),k_mle./(gp_k(1)-1));
+            R0_temp = k.*(1-p)./p;
+            L_Prior(2) = gampdf(R0_temp,gp_R0(1),gp_R0(2));
+            L_Prior(3) = betapdf(cfr,bp_cfr(1),bp_cfr(2));
+            L_Prior(4)=1;
+            L_Prior(5)=1/(5);
+            L_Prior(6)=1/(17);
+            Parameters(n_sim,:)=[k,p,cfr,mu_A,I0,Generation];
+            if(exp(sum(log(L_Prior)))>0)
+                for ss=1:I0
+                    if(ss==1)
+                        [Incidence] = Simulate_Branching_Epidemic(k,p,Generation+length(Date)-1);
+                    else            
+                        Incidence = Incidence+Simulate_Branching_Epidemic(k,p,Generation+length(Date)-1);
+                    end
+                end
+                if(max(Incidence)<10^6)
+                    Est_Case = zeros(size(Incidence)); 
+                    Est_Death = zeros(size(Incidence));
+                    
+                    % Can only count cumulative cases and incidence as of
+                    % April 1 (as rest would be unascertained)
+                    for kk=1:length(Est_Death)
+                        Est_Case(kk) = sum(rand(Incidence(kk),1)<1-mu_A); % Number of ascertained cases
+                        if(kk>1)
+                            Est_Death(kk) = sum(rand(Incidence(kk-1),1)<cfr);
+                        end
+                    end            
+                
+                    if(Generation<=3)
+                        Est_Case_C=cumsum(Est_Case);
+                        Est_Death_C=cumsum(Est_Death);
+                    else
+                        Est_Case_C=cumsum(Est_Case(end-9:end));
+                        Est_Death_C=cumsum(Est_Death(end-9:end));
+                    end
+
+                    Overall_Est_Case_C=cumsum(Est_Case);
+                    Overall_Est_Death_C=cumsum(Est_Death);
+                
+                    Trim_Case_C=Est_Case_C(Generation+1:end);
+                    Trim_Death_C=Est_Death_C(Generation+1:end);
+                    LSE_t=norm(Cases(:)-Trim_Case_C(:))+norm(Trim_Death_C(:)-Deaths(:));
+                end
+            end
+        end
+        
+        Model_Entire_Case{n_sim} = Est_Case_C;
+        Model_Entire_Case_Overall{n_sim} = cumsum(Incidence);
+        Model_Entire_Death{n_sim} = Est_Death_C;
+
+        Model_Cases(n_sim,:) = Trim_Case_C;
+        Model_Deaths(n_sim,:) = Trim_Death_C;
+        
+        temp_c=cumsum(Incidence);
+        Model_Cases_Overall(n_sim,:) = temp_c(Generation+1:end);
+
+        L_Prior = sum(log(L_Prior));
+        LSE(n_sim) = LSE_t;
+        Parameters(n_sim,:)=[k,p,cfr,mu_A,I0,Generation];
+        weight(n_sim) = Calculate_Prior_Weights(weight_old,q_Parameter_MAT_old,L_Prior);
+    end
+    save('BVD_Model_Fit.mat','Parameters','Model_Cases','Model_Deaths','Model_Cases_Overall','Date','Cases','Deaths','Model_Entire_Case','Model_Entire_Case_Overall','Model_Entire_Death');
+end

@@ -202,7 +202,7 @@ display('=======================================================================
 mle = find(N==max(N));
 test_bnds = cumsum(N)./sum(N);
 bnds = [find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")];
-display(['Number of index cases: ' num2str(mle,'%d') ' (95% UI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
+display(['Number of index cases: ' num2str(mle,'%d') ' (95% CrI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
 
 [N,edges] = histcounts(samp_Generation(:,1),-0.5:15.5);
 G_f = edges(1:end-1)+0.5;
@@ -210,17 +210,17 @@ mle = G_f(find(N==max(N)));
 mle_Gen = mle;
 test_bnds = cumsum(N)./sum(N);
 bnds = G_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]);
-display(['Generation of epidemic: ' num2str(mle,'%d') ' (95% UI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
+display(['Generation of epidemic: ' num2str(mle,'%d') ' (95% CrI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
 
 bp = betafit(R(:));
 mle = (bp(1)-1)./(sum(bp)-2);
 bnds = betainv([0.025 0.975],bp(1),bp(2));
-display(['DRC local transmission relative to a seeding event: ' num2str(mle,'%4.3f') ' (95% UI:' num2str(bnds(1),'%4.3f') char(8211) num2str(bnds(2),'%4.3f') ')']);
+display(['DRC local transmission relative to a seeding event: ' num2str(mle,'%3.2f') ' (95% CrI:' num2str(bnds(1),'%3.2f') char(8211) num2str(bnds(2),'%3.2f') ')']);
 
 bp = betafit(binopdf(0,2,R(:)));
 mle = (bp(1)-1)./(sum(bp)-2);
 bnds = betainv([0.025 0.975],bp(1),bp(2));
-display(['Probability two cases in DRC only a seeding event: ' num2str(mle,'%4.3f') ' (95% UI:' num2str(bnds(1),'%4.3f') char(8211) num2str(bnds(2),'%4.3f') ')']);
+display(['Probability two cases in DRC only a seeding event: ' num2str(mle,'%3.2f') ' (95% CrI:' num2str(bnds(1),'%3.2f') char(8211) num2str(bnds(2),'%3.2f') ')']);
 
 
 bp = betafit(binopdf(0,15,R_Uganda(:)));
@@ -237,14 +237,14 @@ else
     ub=1./(1+exp(-ub));
     bnds =[lb ub];
 end
-display(['Probability 15 cases in Uganda only a seeding event: ' num2str(mle,'%4.3f') ' (95% UI:' num2str(bnds(1),'%4.3f') char(8211) num2str(bnds(2),'%4.3f') ')']);
+display(['Probability 15 cases in Uganda only a seeding event: ' num2str(mle,'%3.2f') ' (95% CrI:' num2str(bnds(1),'%3.2f') char(8211) num2str(bnds(2),'%3.2f') ')']);
 
 [N,edges] = histcounts(Cases_Uganda_Local(:),-0.5:15.5);
 case_f = edges(1:end-1)+0.5;
 mle = case_f(find(N==max(N)));
 test_bnds = cumsum(N)./sum(N);
 bnds = case_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]);
-display(['Number cases associated with localized transmission in Uganda: ' num2str(mle,'%d') ' (95% UI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
+display(['Number cases associated with localized transmission in Uganda: ' num2str(mle,'%d') ' (95% CrI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
 
 
 [N,edges] = histcounts(test_time(:,1),-0.5:250);
@@ -252,7 +252,7 @@ time_f = edges(1:end-1)+0.5;
 mle = datenum('May 13, 2026') - time_f(find(N==max(N)));
 test_bnds = cumsum(N)./sum(N);
 bnds = datenum('May 13, 2026') -flip(time_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]));
-display(['Date epidemic originated: ' datestr(mle) ' (95% UI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
+display(['Date epidemic originated: ' datestr(mle) ' (95% CrI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
 
 
 [N,edges] = histcounts(test_time(samp_Generation(:,1)==G_ref,1),-0.5:250);
@@ -260,7 +260,7 @@ time_f = edges(1:end-1)+0.5;
 mle = datenum('May 13, 2026') - time_f(find(N==max(N)));
 test_bnds = cumsum(N)./sum(N);
 bnds = datenum('May 13, 2026') -flip(time_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]));
-display(['Date epidemic originated if in generation ' num2str(G_ref,'%d') ': ' datestr(mle) ' (95% UI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
+display(['Date epidemic originated if in generation ' num2str(G_ref,'%d') ': ' datestr(mle) ' (95% CrI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
 
 
 display('=================================================================================')
@@ -271,7 +271,7 @@ display('=======================================================================
 mle = find(N==max(N));
 test_bnds = cumsum(N)./sum(N);
 bnds = [find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")];
-display(['Number of index cases: ' num2str(mle,'%d') ' (95% UI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
+display(['Number of index cases: ' num2str(mle,'%d') ' (95% CrI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
 
 [N,edges] = histcounts(samp_Generation(:,2),-0.5:15.5);
 G_f = edges(1:end-1)+0.5;
@@ -279,7 +279,7 @@ mle = G_f(find(N==max(N)));
 mle_Gen = mle;
 test_bnds = cumsum(N)./sum(N);
 bnds = G_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]);
-display(['Generation of epidemic: ' num2str(mle,'%d') ' (95% UI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
+display(['Generation of epidemic: ' num2str(mle,'%d') ' (95% CrI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
 
 
 [N,edges] = histcounts(test_time(:,2),-0.5:250);
@@ -287,14 +287,14 @@ time_f = edges(1:end-1)+0.5;
 mle = datenum('May 13, 2026') - time_f(find(N==max(N)));
 test_bnds = cumsum(N)./sum(N);
 bnds = datenum('May 13, 2026') -flip(time_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]));
-display(['Date epidemic originated: ' datestr(mle) ' (95% UI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
+display(['Date epidemic originated: ' datestr(mle) ' (95% CrI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
 
 [N,edges] = histcounts(test_time(samp_Generation(:,2)==mle_Gen,2),-0.5:250);
 time_f = edges(1:end-1)+0.5;
 mle = datenum('May 13, 2026') - time_f(find(N==max(N)));
 test_bnds = cumsum(N)./sum(N);
 bnds = datenum('May 13, 2026') -flip(time_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]));
-display(['Date epidemic originated if in generation ' num2str(mle_Gen,'%d') ': ' datestr(mle) ' (95% UI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
+display(['Date epidemic originated if in generation ' num2str(mle_Gen,'%d') ': ' datestr(mle) ' (95% CrI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
 
 display('=================================================================================')
 display('Combined')
@@ -304,7 +304,7 @@ display('=======================================================================
 mle = find(N==max(N));
 test_bnds = cumsum(N)./sum(N);
 bnds = [find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")];
-display(['Number of index cases: ' num2str(mle,'%d') ' (95% UI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
+display(['Number of index cases: ' num2str(mle,'%d') ' (95% CrI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
 
 [N,edges] = histcounts(samp_Generation(:,3),-0.5:15.5);
 G_f = edges(1:end-1)+0.5;
@@ -312,7 +312,7 @@ mle = G_f(find(N==max(N)));
 mle_Gen = mle;
 test_bnds = cumsum(N)./sum(N);
 bnds = G_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]);
-display(['Generation of epidemic: ' num2str(mle,'%d') ' (95% UI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
+display(['Generation of epidemic: ' num2str(mle,'%d') ' (95% CrI:' num2str(bnds(1),'%d') char(8211) num2str(bnds(2),'%d') ')']);
 
 
 
@@ -321,7 +321,7 @@ time_f = edges(1:end-1)+0.5;
 mle = datenum('May 13, 2026') - time_f(find(N==max(N)));
 test_bnds = cumsum(N)./sum(N);
 bnds = datenum('May 13, 2026') -flip(time_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]));
-display(['Date epidemic originated: ' datestr(mle) ' (95% UI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
+display(['Date epidemic originated: ' datestr(mle) ' (95% CrI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
 
 
 [N,edges] = histcounts(test_time(samp_Generation(:,3)==mle_Gen,3),-0.5:250);
@@ -329,7 +329,7 @@ time_f = edges(1:end-1)+0.5;
 mle = datenum('May 13, 2026') - time_f(find(N==max(N)));
 test_bnds = cumsum(N)./sum(N);
 bnds = datenum('May 13, 2026') -flip(time_f([find(test_bnds>=0.025,1,"first") find(test_bnds>=0.975,1,"first")]));
-display(['Date epidemic originated if in generation ' num2str(mle_Gen,'%d') ': ' datestr(mle) ' (95% UI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
+display(['Date epidemic originated if in generation ' num2str(mle_Gen,'%d') ': ' datestr(mle) ' (95% CrI:' datestr(bnds(1)) char(8211) datestr(bnds(2)) ')']);
 
 
 

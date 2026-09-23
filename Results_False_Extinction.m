@@ -9,36 +9,42 @@ u=Parameters(:,4);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Probability of extinction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+opts = optimoptions("fmincon","Display","none","FunctionTolerance",10^(-9));
 Prob_True_Extinction=p.^k;
 Prob_False_Extinction=p.^k.*(1-(1-u.*(1-p)).^k)./((1-u.*(1-p)).^k); 
 Prob_Apparent_Extinction = Prob_True_Extinction + Prob_False_Extinction;
 Conditional_Prob_Extinction = (1-u.*(1-p)).^k;
 % False extinction
-b = betafit(Prob_False_Extinction);
-mle = (b(1)-1)./(sum(b)-2);
+b = fitdist(Prob_False_Extinction,'Kernel','Support',[0 1]);
+mle = fmincon(@(z)-log(pdf(b,z)),mean(Prob_False_Extinction),[],[],[],[],0,1,[],opts);
 mle_false_ext = mle;
-lb = betainv(0.025,b(1),b(2));
-ub = betainv(0.975,b(1),b(2));
+lb = icdf(b,0.025);
+ub = icdf(b,0.975);
 
-display(['The probability of false extinction: ' num2str(mle,'%4.3f') ' (95% CrI: ' num2str(lb,'%4.3f') char(8211) num2str(ub,'%4.3f') ')']);
-display(['The average number of ascertained cases for false-extinction event to occurr: ' num2str(round(1./mle),'%d') ' (95% CrI: ' num2str(round(1./ub),'%d') char(8211) num2str(round(1./lb),'%d') ')']);
+display(['The probability of false extinction: ' num2str(mle,'%3.2f') ' (95% CrI: ' num2str(lb,'%3.2f') char(8211) num2str(ub,'%3.2f') ')']);
+
+b = fitdist(1./Prob_False_Extinction,'Kernel','Support','positive');
+mle = fmincon(@(z)-log(pdf(b,z)),mean(1./Prob_False_Extinction),[],[],[],[],0,100,[],opts);
+lb = icdf(b,0.025);
+ub = icdf(b,0.975);
+
+display(['The average number of ascertained cases for false-extinction event to occurr: ' num2str(round(mle),'%d') ' (95% CrI: ' num2str(round(lb),'%d') char(8211) num2str(round(ub),'%d') ')']);
 
 % Apparent extinction
-b = betafit(Prob_Apparent_Extinction);
-mle = (b(1)-1)./(sum(b)-2);
-lb = betainv(0.025,b(1),b(2));
-ub = betainv(0.975,b(1),b(2));
+b = fitdist(Prob_Apparent_Extinction,'Kernel','Support',[0 1]);
+mle = fmincon(@(z)-log(pdf(b,z)),mean(Prob_Apparent_Extinction),[],[],[],[],0,1,[],opts);
+lb = icdf(b,0.025);
+ub = icdf(b,0.975);
 
-display(['The probability of apparent extinction: ' num2str(mle,'%4.3f') ' (95% CrI: ' num2str(lb,'%4.3f') char(8211) num2str(ub,'%4.3f') ')']);
+display(['The probability of apparent extinction: ' num2str(mle,'%3.2f') ' (95% CrI: ' num2str(lb,'%3.2f') char(8211) num2str(ub,'%3.2f') ')']);
 
 % True extinction: Conditional on extinction
-b = betafit(Conditional_Prob_Extinction);
-mle = (b(1)-1)./(sum(b)-2);
-lb = betainv(0.025,b(1),b(2));
-ub = betainv(0.975,b(1),b(2));
+b = fitdist(Conditional_Prob_Extinction,'Kernel','Support',[0 1]);
+mle = fmincon(@(z)-log(pdf(b,z)),mean(Conditional_Prob_Extinction),[],[],[],[],0,1,[],opts);
+lb = icdf(b,0.025);
+ub = icdf(b,0.975);
 
-display(['Conditional on apparent extinctio, the probability of true extinction: ' num2str(mle,'%4.3f') ' (95% CrI: ' num2str(lb,'%4.3f') char(8211) num2str(ub,'%4.3f') ')']);
+display(['Conditional on apparent extinctio, the probability of true extinction: ' num2str(mle,'%3.2f') ' (95% CrI: ' num2str(lb,'%3.2f') char(8211) num2str(ub,'%3.2f') ')']);
 
 N_Confirmed = 5514;
 x=[0:N_Confirmed];

@@ -91,10 +91,10 @@ mle = (par_dist.a-1).*par_dist.b;
 lb = gaminv(0.025,par_dist.a,par_dist.b);
 ub = gaminv(0.975,par_dist.a,par_dist.b);
 
-display(['Dispersion coefficient: ' num2str(mle,'%4.3f') ' (95% CrI: ' num2str(lb,'%4.3f') char(8211) num2str(ub,'%4.3f') ')'])
+display(['Dispersion coefficient: ' num2str(mle,'%3.2f') ' (95% CrI: ' num2str(lb,'%3.2f') char(8211) num2str(ub,'%3.2f') ')'])
 
 subplot('Position',[0.1 0.05 0.4 0.265])
-h=histfit(mu,25,"beta");
+h=histfit(mu,51,'kernel','Support',[0 1]);
 set(gca,'LineWidth',2,'tickdir','out','FontSize',12,'XTick',[0:0.05:0.5])
 xlabel('Underascertainment rate (\mu)','FontSize',14)
 ylabel('Frequency','FontSize',14)
@@ -105,14 +105,14 @@ h(2).Color=hex2rgb('#C5001A');
 h(2).LineStyle='-.';
 box off;
 xtickangle(0)
-xlim([0 0.5])
+% xlim([0 0.5])
 
-par_dist = fitdist(mu,'beta');
-mle = (par_dist.a-1)./(par_dist.a+par_dist.b-2);
-lb = betainv(0.025,par_dist.a,par_dist.b);
-ub = betainv(0.975,par_dist.a,par_dist.b);
+par_dist = fitdist(mu,'kernel','Support',[0 1]);
+mle = fmincon(@(z)-log(pdf(par_dist,z)),mean(mu),[],[],[],[],0,1);
+lb = icdf(par_dist,0.025);
+ub = icdf(par_dist,0.975);
 
-display(['Underascertainment rate: ' num2str(mle,'%4.3f') ' (95% CrI: ' num2str(lb,'%4.3f') char(8211) num2str(ub,'%4.3f') ')'])
+display(['Underascertainment rate: ' num2str(mle,'%3.2f') ' (95% CrI: ' num2str(lb,'%3.2f') char(8211) num2str(ub,'%3.2f') ')'])
 
 subplot('Position',[0.58 0.05 0.4 0.265])
 h=histfit(cfr,25,"beta");
@@ -133,7 +133,7 @@ mle = (par_dist.a-1)./(par_dist.a+par_dist.b-2);
 lb = betainv(0.025,par_dist.a,par_dist.b);
 ub = betainv(0.975,par_dist.a,par_dist.b);
 
-display(['Case-fatality rate: ' num2str(mle,'%4.3f') ' (95% CrI: ' num2str(lb,'%4.3f') char(8211) num2str(ub,'%4.3f') ')'])
+display(['Case-fatality rate: ' num2str(mle,'%3.2f') ' (95% CrI: ' num2str(lb,'%3.2f') char(8211) num2str(ub,'%3.2f') ')'])
 
 
 theme('light')

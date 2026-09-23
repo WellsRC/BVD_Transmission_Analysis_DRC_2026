@@ -1,9 +1,9 @@
-% clear;
-% clc;
-eps_T=[1.2*10^4 1.1*10^4 9.5*10^3 7.5*10^3 5.5*10^3 4*10^3 3*10^3 2.5*10^3 2*10^3 1.75*10^3 1.5*10^3 1.3*10^3 1.2*10^3 1.1*10^3 10^3];
-
+clear;
+clc;
+% eps_T=[1.2*10^4 1.1*10^4 9.5*10^3 7.5*10^3 5.5*10^3 4*10^3 3*10^3 2.5*10^3 2*10^3 1.75*10^3 1.5*10^3 1.3*10^3 1.2*10^3 1.1*10^3 10^3];
+ eps_T=[3.2 2.6 2 1.75 1.5 1.35 1.25 1.2 1.15].*10^3;
 rng(20260720)
-N_Samp = 1000;
+N_Samp = 5000;
 Parameters = zeros(N_Samp,6);
 LSE = zeros(N_Samp,1);
 weight = zeros(1,N_Samp);
@@ -12,9 +12,9 @@ q_Parameter_MAT = ones(N_Samp,6);
 % Used June 13 as June 12 was not available
 Date = datenum({'May 13, 2026'; 'May 29, 2026';'June 13, 2026'; 'June 27, 2026'; 'July 12, 2026'; 'July 27, 2026'; 'August 11, 2026'});
 Cases = [246 906+263 906+782 906+1274 906+1963 906+3360 906+4566];
-% Cases = [Cases(1) diff(Cases)];
+Cases = [Cases(1) diff(Cases)];
 Deaths = [80 223+42 223+181 223+360 223+718 223+1487 223+2128];
-% Deaths = [Deaths(1) diff(Deaths)];
+Deaths = [Deaths(1) diff(Deaths)];
 
 Model_Cases = zeros(N_Samp,length(Cases));
 Model_Deaths = zeros(N_Samp,length(Cases));
@@ -89,6 +89,8 @@ for jj = 1:length(eps_T)
                     Est_Case = zeros(size(Incidence)); 
                     Est_Death = zeros(size(Incidence));
                     
+                    % Can only count cumulative cases and incidence as of
+                    % April 1 (as rest would be unascertained)
                     for kk=1:length(Est_Death)
                         Est_Case(kk) = sum(rand(Incidence(kk),1)<1-mu_A); % Number of ascertained cases
                         if(kk>1)
@@ -96,12 +98,19 @@ for jj = 1:length(eps_T)
                         end
                     end            
                 
-                    Est_Case_C=cumsum(Est_Case);
-                    Est_Death_C=cumsum(Est_Death);
+                    if(Generation<=3)
+                        Est_Case_C=cumsum(Est_Case);
+                        Est_Death_C=cumsum(Est_Death);
+                    else
+                        Est_Case_C=cumsum(Est_Case(end-9:end));
+                        Est_Death_C=cumsum(Est_Death(end-9:end));
+                    end
                 
-                    Trim_Case_C=Est_Case_C(Generation+1:end);
-                    Trim_Death_C=Est_Death_C(Generation+1:end);
-                    LSE_t=norm(Cases(:)-Trim_Case_C(:))+norm(Trim_Death_C(:)-Deaths(:));
+                    Trim_Case_C=Est_Case_C(end-6:end);
+                    Trim_Case_C =[Trim_Case_C(1) diff(Trim_Case_C)];
+                    Trim_Death_C=Est_Death_C(end-6:end);
+                    Trim_Death_C =[Trim_Death_C(1) diff(Trim_Death_C)];
+                    LSE_t=norm(Trim_Case_C(:)-Cases(:))+norm(Trim_Death_C(:)-Deaths(:));
                 end
             end
         end

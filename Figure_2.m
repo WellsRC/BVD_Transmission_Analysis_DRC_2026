@@ -1,7 +1,7 @@
 clear;
 clc;
 if isempty(gcp('nocreate'))
-    parpool(6);
+    parpool(16);
 end
 
 load("BVD_Model_Fit.mat",'Parameters')
@@ -128,11 +128,13 @@ for ww=1:length(f_discrete)
     end
 end
 
-display(['Probability local transmission vs seeding event (EARLY): ' num2str(PDF_prev(t_ref==16),'%4.3f') ' (95% CrI: ' num2str(PDF_prev_lb(t_ref==16),'%4.3f') char(8211) num2str(PDF_prev_ub(t_ref==16),'%4.3f') ')'])
-display(['Probability local transmission vs seeding event (LATE): ' num2str(PDF_prev(t_ref==400),'%4.3f') ' (95% CrI: ' num2str(PDF_prev_lb(t_ref==400),'%4.3f') char(8211) num2str(PDF_prev_ub(t_ref==400),'%4.3f') ')'])
+display(['Probability local transmission vs seeding event (EARLY): ' num2str(PDF_prev(t_ref==16),'%3.2f') ' (95% CrI: ' num2str(PDF_prev_lb(t_ref==16),'%3.2f') char(8211) num2str(PDF_prev_ub(t_ref==16),'%3.2f') ')'])
+display(['Probability local transmission vs seeding event (LATE): ' num2str(PDF_prev(t_ref==400),'%3.2f') ' (95% CrI: ' num2str(PDF_prev_lb(t_ref==400),'%3.2f') char(8211) num2str(PDF_prev_ub(t_ref==400),'%3.2f') ')'])
 
+
+t_peak = t_ref(median(Prev)==max(median(Prev)));
 for ww=1:length(f_discrete)
-    display(['(Frequency ' num2str(f_discrete(ww),'%d') ') Cumualtive Probability local transmission vs seeding event at t=195: ' num2str(Cumulative_PDF_prev(ww,t_ref==195),'%4.3f') ' (95% CrI: ' num2str(Cumulative_PDF_prev_lb(ww,t_ref==195),'%4.3f') char(8211) num2str(Cumulative_PDF_prev_ub(ww,t_ref==195),'%4.3f') ')'])
+    display(['(Frequency ' num2str(f_discrete(ww),'%d') ') Cumualtive Probability local transmission vs seeding event at t=' num2str(t_peak,'%d') ': ' num2str(Cumulative_PDF_prev(ww,t_ref==t_peak),'%3.2f') ' (95% CrI: ' num2str(Cumulative_PDF_prev_lb(ww,t_ref==t_peak),'%3.2f') char(8211) num2str(Cumulative_PDF_prev_ub(ww,t_ref==t_peak),'%3.2f') ')'])
 end
 
 
@@ -156,6 +158,8 @@ legend([l3 l4 l2 l1],{'Mean','Median','95% CrI','IQR'})
 legend boxoff;
 xtickangle(0)
 
+t_peak = t_ref(median(Prev)==max(median(Prev)));
+
 text(-0.16,0.99,'A','FontSize',28,'VerticalAlignment','middle','Units','normalized');
 
 subplot('Position',[0.525 0.58 0.38 0.37])
@@ -163,7 +167,7 @@ patch([t_ref flip(t_ref)],[PDF_prev_lb flip(PDF_prev_ub)],'k','LineStyle','none'
 plot(t_ref,PDF_prev,'color','k','LineWidth',2); hold on
 set(gca,'TickDir','out','LineWidth',2,'XTick',[0:50:400],'YTick',[0:0.05:0.25],'Fontsize',14,'Xminortick','on')
 xlim([0 400])
-ylim([0 0.25])
+ylim([0 0.35])
 ylabel({'Probability',' of local transmission'},'Fontsize',16)
 xlabel('Day','Fontsize',16)
 box off
@@ -189,7 +193,12 @@ for ww=1:length(f)
      T_MAX(ww)= t_ref(Y_PDF_Normalized(ww,:)==max(Y_PDF_Normalized(ww,:)));
 end
 test = max(Y_PDF_Normalized,[],2);
-pcolor(t_ref,f,Y_PDF_Normalized,'LineStyle','none')
+pcolor(t_ref,f,Y_PDF_Normalized,'LineStyle','none'); hold on;
+
+t_max = zeros(length(f),1);
+for jj=1:length(t_max)
+    t_max(jj) = t_ref(Y_PDF_Normalized(jj,:)==max(Y_PDF_Normalized(jj,:)));
+end
 
 c=colormap("pink");
 colormap(flip(c));
@@ -202,6 +211,7 @@ c.Label.FontSize=16;
 
 set(gca,'TickDir','out','LineWidth',2,'XTick',[0:50:400],'YTick',[7:7:35],'Yminortick','on','Fontsize',14,'Xminortick','on')
 xlim([0 400])
+plot(t_peak.*ones(size(f)),f,'-.','Color',[0.5 0.5 0.5],'LineWidth',2);
 box off;
 xtickangle(0)
 
