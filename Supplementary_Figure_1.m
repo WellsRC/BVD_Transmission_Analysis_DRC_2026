@@ -94,11 +94,12 @@ ub = gaminv(0.975,par_dist.a,par_dist.b);
 display(['Dispersion coefficient: ' num2str(mle,'%3.2f') ' (95% CrI: ' num2str(lb,'%3.2f') char(8211) num2str(ub,'%3.2f') ')'])
 
 subplot('Position',[0.1 0.05 0.4 0.265])
-h=histfit(mu,51,'kernel','Support',[0 1]);
-set(gca,'LineWidth',2,'tickdir','out','FontSize',12,'XTick',[0:0.05:0.5])
-xlabel('Underascertainment rate (\mu)','FontSize',14)
+h=histfit(1-mu,51,'kernel','Support',[0 1]);
+set(gca,'LineWidth',2,'tickdir','out','FontSize',12,'XTick',[0.4:0.05:1])
+xlabel('Ascertainment rate (1-\mu)','FontSize',14)
 ylabel('Frequency','FontSize',14)
 text(-0.19,0.98,'E','FontSize',30,'Units','normalized')
+xlim([0.45 0.95])
 h(1).FaceColor=[0.5 0.5 0.5];
 h(1).EdgeColor='w';
 h(2).Color=hex2rgb('#C5001A');
@@ -107,8 +108,15 @@ box off;
 xtickangle(0)
 % xlim([0 0.5])
 
+par_dist = fitdist(1-mu,'kernel','Support',[0 1]);
+mle = fmincon(@(z)-log(pdf(par_dist,z)),mean(1-mu),[],[],[],[],0,1);
+lb = icdf(par_dist,0.025);
+ub = icdf(par_dist,0.975);
+
+display(['Ascertainment rate: ' num2str(mle,'%3.2f') ' (95% CrI: ' num2str(lb,'%3.2f') char(8211) num2str(ub,'%3.2f') ')'])
+
 par_dist = fitdist(mu,'kernel','Support',[0 1]);
-mle = fmincon(@(z)-log(pdf(par_dist,z)),mean(mu),[],[],[],[],0,1);
+mle = fmincon(@(z)-log(pdf(par_dist,z)),mean(1-mu),[],[],[],[],0,1);
 lb = icdf(par_dist,0.025);
 ub = icdf(par_dist,0.975);
 

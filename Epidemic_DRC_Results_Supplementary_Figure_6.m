@@ -4,7 +4,7 @@ clear;
 
 N_Samp=10^4;
 
-
+% Construct a proxy incidence curve from the historical information 
 rng(20260720)
 for IndxC=1:5
     for ss=1:IndxC
@@ -14,7 +14,7 @@ for IndxC=1:5
             Incidence = Incidence+Simulate_Branching_Epidemic(k_mle.*ones(N_Samp,1),p_mle.*ones(N_Samp,1),20);
         end
     end
-    if(IndxC==2)
+    if(IndxC==1)
         Incidence_Prev_Approx = Incidence;
     end
 end
@@ -68,24 +68,31 @@ end
 G_f = edges(1:end-1)+0.5;
 G_ref = G_f(N==max(N));
 
-R=zeros(N_Samp,1);
 
-Prev_Approx=Incidence_Prev_Approx;
-c_temp =cumsum(Incidence_Prev_Approx,2);
-f_indx = c_temp(:,G_ref+1)>=246;
-Prev_Approx = Prev_Approx(f_indx,:);
-u=0.57;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DRC Analysis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+R=zeros(N_Samp,1); % For the probability of local transmission comapred to seeding event
+Prev_Approx=Incidence_Prev_Approx; % Use incidence as proxy for prevalence
+c_temp =cumsum(Incidence_Prev_Approx,2); 
+
+indx_shift_generation= 1; % The shift  G_ref to add the additional generation/serial interval
+G_ref_DRC = G_ref+indx_shift_generation; % May 24 would be the next generation from the referenced
+f_indx = c_temp(:,G_ref+1)>=246; % Find the simulations where there are at least 246 cases at the reference generation (add 1 because the index Gref could be zero)
+Prev_Approx = Prev_Approx(f_indx,:); % Set the prevalence to all of those scenarioes
+u=0.57; % The underascertainment rate
 for ss=1:N_Samp
-    zeta_G=zeros(10,1);
-    past_seeding_rate=zeros(10,1);
+    zeta_G=zeros(10,1); % Probability of local transmission based on generation
+    past_seeding_rate=zeros(10,1); % past seeding rates
     for G=1:10 % Numebr of generations back
         if(G==1)
-            if(G_ref-G<0)
+            if(G_ref_DRC-G<0)
                 seed_rate=0;
-            elseif(G_ref==G)
-                seed_rate=mean(Prev_Approx(:,G_ref-G+1)); % Initial condition
+            elseif(G_ref_DRC==G)
+                seed_rate=mean(Prev_Approx(:,G_ref_DRC-G+1)); % Initial condition (i.e. generation zero)
             else
-                seed_rate = Prev_Approx(randi(nnz(f_indx)),G_ref-G+1);
+                seed_rate = Prev_Approx(randi(nnz(f_indx)),G_ref_DRC-G+1);
             end
             zeta_G(G)=seed_rate.*(u-u.*p_mle.^k_mle./(1-u.*(1-p_mle)).^k_mle);
         else
@@ -94,12 +101,12 @@ for ss=1:N_Samp
             zeta_ratio(past_seeding_rate_temp(:)==0)=0;
             temp_u = u-sum(zeta_ratio);
 
-            if(G_ref-G<0)
+            if(G_ref_DRC-G<0)
                 seed_rate=0;
-            elseif(G_ref==G)
-                seed_rate=mean(Prev_Approx(:,G_ref-G+1)); % Initial condition
+            elseif(G_ref_DRC==G)
+                seed_rate=mean(Prev_Approx(:,G_ref_DRC-G+1)); % Initial condition
             else
-                seed_rate = Prev_Approx(randi(nnz(f_indx)),G_ref-G+1);
+                seed_rate = Prev_Approx(randi(nnz(f_indx)),G_ref_DRC-G+1);
             end
 
             zeta_G(G) = seed_rate.*(temp_u - u.*p_mle.^k_mle./(1-temp_u.*(1-p_mle)).^k_mle);
@@ -108,24 +115,28 @@ for ss=1:N_Samp
     end
 
     L_HH=sum(zeta_G);
-    L_S=(1-u).*Prev_Approx(randi(nnz(f_indx)),G_ref+1);
+    L_S=(1-u).*Prev_Approx(randi(nnz(f_indx)),G_ref_DRC+1);
 
     R(ss)=L_HH./(L_HH+L_S);
 end
-% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Uganda Analysis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % https://academic.oup.com/cid/article-abstract/62/10/1277/2462818?login=false
 u_mle =0.271;
 bp_asym = lsqnonlin(@(z) betainv([0.025 0.975],z,(z-u_mle.*z+2.*u_mle-1)./u_mle)-[0.145 0.396],3,1,100);
 b=(bp_asym-u_mle.*bp_asym+2.*u_mle-1)./u_mle;
 u=betarnd(bp_asym,b,N_Samp,1);
-G_ref_U=G_ref+3;
-current_G=1;
+indx_shift_generation= 1; % The shift  G_ref to add the additional generation/serial interval
+G_ref_U = G_ref+indx_shift_generation; % May 24 would be the next generation from the reference generation for May 13
+
 x_past=[];
 R_Uganda = zeros(N_Samp,1);
 Prev_Approx=Incidence_Prev_Approx;
 c_temp =cumsum(Incidence_Prev_Approx,2);
 Prev_Approx = Prev_Approx(f_indx,:);
-
+Cases_Uganda_Reported=7;  % https://reliefweb.int/report/democratic-republic-congo/unicef-ebola-virus-disease-outbreak-flash-update-no-1-democratic-republic-congo-uganda-26-may-2026
+% Cases_Uganda_Reported=2; %% https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON603  (May 21)
 Cases_Uganda_Local= zeros(length(R_Uganda),10^3);
 for ss=1:N_Samp
     zeta_G=zeros(10,1);
@@ -163,9 +174,13 @@ for ss=1:N_Samp
     L_S=(1-u(ss)).*Prev_Approx(randi(nnz(f_indx)),G_ref_U+1);
 
     R_Uganda(ss)=L_HH./(L_HH+L_S);
-       Cases_Uganda_Local(ss,:)=binornd(15,R_Uganda(ss),1,10^3);
+       Cases_Uganda_Local(ss,:)=binornd(Cases_Uganda_Reported,R_Uganda(ss),1,10^3);
 end
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Time distributions for determining the origin time
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 gp = lsqnonlin(@(z) gaminv([0.025 0.975],z,15.36/(z-1))-[13.29 17.42],100,1,5000);
 a_gp_serial=gp;
@@ -223,12 +238,12 @@ bnds = betainv([0.025 0.975],bp(1),bp(2));
 display(['Probability two cases in DRC only a seeding event: ' num2str(mle,'%3.2f') ' (95% CrI:' num2str(bnds(1),'%3.2f') char(8211) num2str(bnds(2),'%3.2f') ')']);
 
 
-bp = betafit(binopdf(0,15,R_Uganda(:)));
+bp = betafit(binopdf(0,Cases_Uganda_Reported,R_Uganda(:)));
 if(bp(1)>1)
     mle = (bp(1)-1)./(sum(bp)-2);
     bnds = betainv([0.025 0.975],bp(1),bp(2));
 else
-    pu=binopdf(0,15,R_Uganda(:));
+    pu=binopdf(0,Cases_Uganda_Reported,R_Uganda(:));
     [mn,sn] = normfit(log(pu./(1-pu)));
     mle = 1./(1+exp(-mn));
     lb = norminv(0.025,mn,sn);
@@ -237,7 +252,7 @@ else
     ub=1./(1+exp(-ub));
     bnds =[lb ub];
 end
-display(['Probability 15 cases in Uganda only a seeding event: ' num2str(mle,'%3.2f') ' (95% CrI:' num2str(bnds(1),'%3.2f') char(8211) num2str(bnds(2),'%3.2f') ')']);
+display(['Probability ' num2str(Cases_Uganda_Reported) ' cases in Uganda only a seeding event: ' num2str(mle,'%3.2f') ' (95% CrI:' num2str(bnds(1),'%3.2f') char(8211) num2str(bnds(2),'%3.2f') ')']);
 
 [N,edges] = histcounts(Cases_Uganda_Local(:),-0.5:15.5);
 case_f = edges(1:end-1)+0.5;
