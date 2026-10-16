@@ -111,7 +111,7 @@ ylim([0 2])
 
 
 theme('light')
-print(gcf,['Supplementary_Figure_3.png'],'-dpng','-r300');
+print(gcf,['Supplementary_Figure_2.png'],'-dpng','-r300');
 
 
 pAv=[0.7 0.8 0.9 0.99];
@@ -164,4 +164,4 @@ set(gca,'YTick',[],'XTick',[])
 xlim([0 1])
 ylim([0 2])
 theme('light')
-print(gcf,['Supplementary_Figure_4.png'],'-dpng','-r300');
+print(gcf,['Supplementary_Figure_3.png'],'-dpng','-r300');

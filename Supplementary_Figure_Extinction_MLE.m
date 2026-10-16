@@ -149,4 +149,4 @@ text(-0.19,1.02,'D','FontSize',28,'Units','normalized')
 
 theme('light')
 
-print(gcf, 'Supplementary_Figure_2.png','-dpng','-r300');
+

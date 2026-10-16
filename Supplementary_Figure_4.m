@@ -29,9 +29,9 @@ parfor kk=1:length(k)
     sigma_G_1(:,kk)=Sample_Approximation_Detection_Chain(Num_Gen,1,u(kk),k(kk),p(kk),1);
 end
 
-save('Output_Fig_S5.mat')
+save('Output_Fig_S4.mat')
 
-load('Output_Fig_S5.mat');
+load('Output_Fig_S4.mat');
 Gen_Det=zeros(1,length(k));
 E_Det = zeros(1,length(k));
 for kk=1:length(k)
@@ -82,4 +82,4 @@ xlabel('Generation','FontSize',14)
 ylabel('Partial Rank Correlation Coefficient','FontSize',14)
 legend([p1 p2 p3],{'Underascertainment','Basic reproduction number','Dispersion coefficient'},'Position',[0.819907415427971,0.747004933051445,0.148123765635286,0.112050739957717],'FontSize',14)
 theme('light');
-print(gcf, 'Supplementary_Figure_5.png','-dpng','-r300');
+print(gcf, 'Supplementary_Figure_4.png','-dpng','-r300');

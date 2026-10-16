@@ -85,7 +85,6 @@ xlim([0 1])
 ylim([0 1])
 
 theme('light')
-print(gcf, 'Supplementary_Figure_2.png','-dpng','-r300');
 
 for gg=1:3
     for rr=1:2
@@ -158,7 +157,6 @@ xlim([0 1])
 ylim([0 cmax_value])
 
 theme('light')
-print(gcf, 'Supplementary_Figure_3.png','-dpng','-r300');
 
 for gg=1:3
     for rr=1:2
@@ -234,7 +232,6 @@ xlim([0 1])
 ylim([0 cmax_value])
 
 theme('light')
-print(gcf, 'Supplementary_Figure_4.png','-dpng','-r300');
 
 
 
