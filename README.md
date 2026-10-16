@@ -22,47 +22,52 @@ To generate the Figures and output of the calculations, select a script from Fig
 
 ## Function Summary
 ### BVD_Parameters
-### BVD_Probability_of_False_Extinction
+Returns historical epidemiological parameters for BVD Ebola
 ### Calculate_Prior_Weights
-### Compute_Reproduction_Number
-### Generation_Time
-### NB_Branching_Process
-### Parameter_Generation_Time
-### Probability_Asymptomatic_Index_Symptomatic_Generation
-### Probability_Outbreak_Exticnt_Within_Generation
-### Recursive_Summation_Asymptomatic_Chain
-### Recursive_Summation_Detection_Chain
+Calculates the prior weights in the ABC fitting script BVD_ABC_Fitting
 ### Sample_Approximation_Detection_Chain
+A function that approximates the computation of the equation for the detection of cases in a chain
 ### Sample_BVD_Parameters
+Samples the parameters used in the ABC fitting script BVD_ABC_Fitting
 ### Simulate_Branching_Epidemic
-### SIR_ODE_Alt
+Simulates an epidemic using a branching process
 ### SIR_ODE
+The system of ODEs used to generate the prevalence that serves as a proxy for the seeding rate in the generation of Figure 2
 
 ## Script Summary
 ### BVD_ABC_Fitting
+A script used to run the ABC fitting algorithm to the BVD Ebola outbreak in the DRC
 ### BVD_Epidemic_Analysis_Alternate_mle
+Applies the HINT framework under the maximum likelihood parameter estimates for the 2026 BVD outbreak in the DRC to compute the likelihood of the origin date and number of index cases 
 ### BVD_Epidemic_Analysis
-### BVD_Probability_False_Extinction_Events
-### BVD_Probability_of_Extinction
+Applies the HINT framework under historical parameter estimates to compute the likelihood of the origin date and number of index cases 
 ### Epidemic_DRC_Results_Supplementary_Figure_6
+Generates the output and figures for the analysis conducted in BVD_Epidemic_Analysis (Supplementary Figure 5)
 ### Epidemic_DRC_Results_Supplementary_Figure_7_Alternate_mle
+Generates the output and figures for the analysis conducted in BVD_Epidemic_Analysis_Alternate_mle (Supplementary Figure 6)
 ### Figure_1
+Generates the results for the fitting of the model to the reported deaths and cases in the epidemic and the origin date estimated from the ABC fitting(Figure 1)
 ### Figure_2
+Generates the results for attribution of cases with unknown exposure to local transmission or seeding. (Figure 2)
 ### Figure_3
+Generates the results for the distribution of transmission-chain detection by generation (Figure 3)
 ### Results_False_Extinction
+Outputs the results of the main text for false extinction
 ### Supplementary_Figure_1
-### Supplementary_Figure_2
-### Supplementary_Figure_3_and_4
+Outputs the results of the main text for the summary statistics of the parameters estimated during the ABC fitting (Supplementary Figure 1)
+### Supplementary_Figure_3_and_4 
+Generates the figures computing the odds ratio of localized transmission relative to a seeding event across basic reproduction numbers for a homogeneous seeding rate (Supplementary Figures 2 and 3)
 ### Supplementary_Figure_5
-### Supplementary_Figure_Extinction
-### Unknown_Exposure_Spillover_vs_Transmission_Homogeneous_Rate
+Generates the figures computing the PRCC values (Supplementary Figure 4)
 
 ## File Summary
 ### BVD_Model_Fit
+The output from the ABC fitting script BVD_ABC_Fitting
 ### Epidemic_Analysis_Likelihood_Alternate_mle
+The output from the script BVD_Epidemic_Analysis_Alternate_mle
 ### Epidemic_Analysis_Likelihood
-### Ex_vs_Det_Test
+The output from the script BVD_Epidemic_Analysis
 ### Extinction_Detection_Analysis
-### Numerical_Branching_Simulations
+The output save from the initial part of Figure_3 to reduce the time in regenerating the Figure
 ### Output_Fig_S5
-### Output_Test
+The output saved from the initial part of Supplementary_Figure_5 to reduce the time in regenerating the Figure
