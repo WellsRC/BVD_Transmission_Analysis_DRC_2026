@@ -94,7 +94,7 @@ indx_shift_generation= 1; % The shift  G_ref to add the additional generation/se
 G_ref_DRC = G_ref+indx_shift_generation; % May 24 would be the next generation from the referenced
 f_indx = c_temp(:,G_ref+1)>=246; % Find the simulations where there are at least 246 cases at the reference generation (add 1 because the index Gref could be zero)
 Prev_Approx = Prev_Approx(f_indx,:); % Set the prevalence to all of those scenarioes
-u=0.57; % The underascertainment rate
+u=mu_mle; % The underascertainment rate
 for ss=1:N_Samp
     zeta_G=zeros(10,1); % Probability of local transmission based on generation
     past_seeding_rate=zeros(10,1); % past seeding rates
