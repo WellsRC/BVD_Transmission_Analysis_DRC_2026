@@ -41,9 +41,9 @@ A script used to run the ABC fitting algorithm to the BVD Ebola outbreak in the 
 Applies the HINT framework under the maximum likelihood parameter estimates for the 2026 BVD outbreak in the DRC to compute the likelihood of the origin date and number of index cases 
 ### BVD_Epidemic_Analysis
 Applies the HINT framework under historical parameter estimates to compute the likelihood of the origin date and number of index cases 
-### Epidemic_DRC_Results_Supplementary_Figure_6
+### Epidemic_DRC_Results_Supplementary_Figure_5
 Generates the output and figures for the analysis conducted in BVD_Epidemic_Analysis (Supplementary Figure 5)
-### Epidemic_DRC_Results_Supplementary_Figure_7_Alternate_mle
+### Epidemic_DRC_Results_Supplementary_Figure_6_Alternate_mle
 Generates the output and figures for the analysis conducted in BVD_Epidemic_Analysis_Alternate_mle (Supplementary Figure 6)
 ### Figure_1
 Generates the results for the fitting of the model to the reported deaths and cases in the epidemic and the origin date estimated from the ABC fitting(Figure 1)
@@ -55,9 +55,9 @@ Generates the results for the distribution of transmission-chain detection by ge
 Outputs the results of the main text for false extinction
 ### Supplementary_Figure_1
 Outputs the results of the main text for the summary statistics of the parameters estimated during the ABC fitting (Supplementary Figure 1)
-### Supplementary_Figure_3_and_4 
+### Supplementary_Figure_2_and_3 
 Generates the figures computing the odds ratio of localized transmission relative to a seeding event across basic reproduction numbers for a homogeneous seeding rate (Supplementary Figures 2 and 3)
-### Supplementary_Figure_5
+### Supplementary_Figure_4
 Generates the figures computing the PRCC values (Supplementary Figure 4)
 
 ## File Summary
@@ -69,5 +69,5 @@ The output from the script BVD_Epidemic_Analysis_Alternate_mle
 The output from the script BVD_Epidemic_Analysis
 ### Extinction_Detection_Analysis
 The output save from the initial part of Figure_3 to reduce the time in regenerating the Figure
-### Output_Fig_S5
-The output saved from the initial part of Supplementary_Figure_5 to reduce the time in regenerating the Figure
+### Output_Fig_S4
+The output saved from the initial part of Supplementary_Figure_4 to reduce the time in regenerating the Figure
