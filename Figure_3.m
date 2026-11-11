@@ -29,6 +29,14 @@ clc;
 % sigma_G_5=zeros(length(k),Num_Gen+1); 
 % sigma_G_10=zeros(length(k),Num_Gen+1); 
 % 
+% 
+% sigma_G_1_A20=zeros(length(k),Num_Gen+1); 
+% sigma_G_1_A30=zeros(length(k),Num_Gen+1); 
+% sigma_G_1_A40=zeros(length(k),Num_Gen+1); 
+% sigma_G_1_A50=zeros(length(k),Num_Gen+1);
+% sigma_G_1_A70=zeros(length(k),Num_Gen+1); 
+% sigma_G_1_A90=zeros(length(k),Num_Gen+1); 
+% 
 % for nn=1:length(k)
 %     theta_G(nn,1)=nbinpdf(0,k(nn),p(nn)); % Probability extinct w/ index
 % 
@@ -43,6 +51,13 @@ clc;
 %     sigma_G_3(nn,:)=Sample_Approximation_Detection_Chain(Num_Gen,3,mu(nn),k(nn),p(nn),1);
 %     sigma_G_5(nn,:)=Sample_Approximation_Detection_Chain(Num_Gen,5,mu(nn),k(nn),p(nn),1);
 %     sigma_G_10(nn,:)=Sample_Approximation_Detection_Chain(Num_Gen,10,mu(nn),k(nn),p(nn),1);
+% 
+%     sigma_G_1_A20(nn,:)=Sample_Approximation_Detection_Chain(Num_Gen,1,1-0.2,k(nn),p(nn),1);
+%     sigma_G_1_A30(nn,:)=Sample_Approximation_Detection_Chain(Num_Gen,1,1-0.3,k(nn),p(nn),1);
+%     sigma_G_1_A40(nn,:)=Sample_Approximation_Detection_Chain(Num_Gen,1,1-0.4,k(nn),p(nn),1);
+%     sigma_G_1_A50(nn,:)=Sample_Approximation_Detection_Chain(Num_Gen,1,1-0.5,k(nn),p(nn),1);
+%     sigma_G_1_A70(nn,:)=Sample_Approximation_Detection_Chain(Num_Gen,1,1-0.7,k(nn),p(nn),1);
+%     sigma_G_1_A90(nn,:)=Sample_Approximation_Detection_Chain(Num_Gen,1,1-0.9,k(nn),p(nn),1);
 % end
 % 
 % save('Extinction_Detection_Analysis.mat')
@@ -143,9 +158,120 @@ norm_pdf=temp_EBD_10.*pdf_10_trim;
 norm_pdf = norm_pdf./repmat(sum(norm_pdf,2),1,Num_Gen);
 Num_Case_Missed_10 =sum(Cases.*norm_pdf,2);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ascertainment rates
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 20% Ascertainemnt 
+pdf_1_A20 =[sigma_G_1_A20(:,1) diff(sigma_G_1_A20,[],2)];
+pdf_1_A20=pdf_1_A20./repmat(sum(pdf_1_A20,2),1,Num_Gen+1);
+
+pdf_1_A20_trim = pdf_1_A20(:,2:end);
+
+E_1_A20 = sum(theta_G.*pdf_1_A20,2);
+
+temp_EBD_1_A20 = cumsum(theta_G,2).*(1-sigma_G_1_A20);
+temp_EBD_1_A20=temp_EBD_1_A20(:,1:end-1);
+EBD_1_A20 = sum(temp_EBD_1_A20.*pdf_1_A20_trim,2);
+
+R0 = k.*(1-p)./p;
+Cases =cumsum(repmat(R0,1,Num_Gen).^repmat([0:Num_Gen-1],length(k),1),2);
+norm_pdf=temp_EBD_1_A20.*pdf_1_A20_trim;
+norm_pdf = norm_pdf./repmat(sum(norm_pdf,2),1,Num_Gen);
+Num_Case_Missed_1_A20 =sum(Cases.*norm_pdf,2);
+
+% 30% Ascertainemnt 
+pdf_1_A30 =[sigma_G_1_A30(:,1) diff(sigma_G_1_A30,[],2)];
+pdf_1_A30=pdf_1_A30./repmat(sum(pdf_1_A30,2),1,Num_Gen+1);
+
+pdf_1_A30_trim = pdf_1_A30(:,2:end);
+
+E_1_A30 = sum(theta_G.*pdf_1_A30,2);
+
+temp_EBD_1_A30 = cumsum(theta_G,2).*(1-sigma_G_1_A30);
+temp_EBD_1_A30=temp_EBD_1_A30(:,1:end-1);
+EBD_1_A30 = sum(temp_EBD_1_A30.*pdf_1_A30_trim,2);
+
+R0 = k.*(1-p)./p;
+Cases =cumsum(repmat(R0,1,Num_Gen).^repmat([0:Num_Gen-1],length(k),1),2);
+norm_pdf=temp_EBD_1_A30.*pdf_1_A30_trim;
+norm_pdf = norm_pdf./repmat(sum(norm_pdf,2),1,Num_Gen);
+Num_Case_Missed_1_A30 =sum(Cases.*norm_pdf,2);
+
+% 40% Ascertainemnt 
+pdf_1_A40 =[sigma_G_1_A40(:,1) diff(sigma_G_1_A40,[],2)];
+pdf_1_A40=pdf_1_A40./repmat(sum(pdf_1_A40,2),1,Num_Gen+1);
+
+pdf_1_A40_trim = pdf_1_A40(:,2:end);
+
+E_1_A40 = sum(theta_G.*pdf_1_A40,2);
+
+temp_EBD_1_A40 = cumsum(theta_G,2).*(1-sigma_G_1_A40);
+temp_EBD_1_A40=temp_EBD_1_A40(:,1:end-1);
+EBD_1_A40 = sum(temp_EBD_1_A40.*pdf_1_A40_trim,2);
+
+R0 = k.*(1-p)./p;
+Cases =cumsum(repmat(R0,1,Num_Gen).^repmat([0:Num_Gen-1],length(k),1),2);
+norm_pdf=temp_EBD_1_A40.*pdf_1_A40_trim;
+norm_pdf = norm_pdf./repmat(sum(norm_pdf,2),1,Num_Gen);
+Num_Case_Missed_1_A40 =sum(Cases.*norm_pdf,2);
+
+% 50% Ascertainemnt 
+pdf_1_A50 =[sigma_G_1_A50(:,1) diff(sigma_G_1_A50,[],2)];
+pdf_1_A50=pdf_1_A50./repmat(sum(pdf_1_A50,2),1,Num_Gen+1);
+
+pdf_1_A50_trim = pdf_1_A50(:,2:end);
+
+E_1_A50 = sum(theta_G.*pdf_1_A50,2);
+
+temp_EBD_1_A50 = cumsum(theta_G,2).*(1-sigma_G_1_A50);
+temp_EBD_1_A50=temp_EBD_1_A50(:,1:end-1);
+EBD_1_A50 = sum(temp_EBD_1_A50.*pdf_1_A50_trim,2);
+
+R0 = k.*(1-p)./p;
+Cases =cumsum(repmat(R0,1,Num_Gen).^repmat([0:Num_Gen-1],length(k),1),2);
+norm_pdf=temp_EBD_1_A50.*pdf_1_A50_trim;
+norm_pdf = norm_pdf./repmat(sum(norm_pdf,2),1,Num_Gen);
+Num_Case_Missed_1_A50 =sum(Cases.*norm_pdf,2);
+
+% 70% Ascertainemnt 
+pdf_1_A70 =[sigma_G_1_A70(:,1) diff(sigma_G_1_A70,[],2)];
+pdf_1_A70=pdf_1_A70./repmat(sum(pdf_1_A70,2),1,Num_Gen+1);
+
+pdf_1_A70_trim = pdf_1_A70(:,2:end);
+
+E_1_A70 = sum(theta_G.*pdf_1_A70,2);
+
+temp_EBD_1_A70 = cumsum(theta_G,2).*(1-sigma_G_1_A70);
+temp_EBD_1_A70=temp_EBD_1_A70(:,1:end-1);
+EBD_1_A70 = sum(temp_EBD_1_A70.*pdf_1_A70_trim,2);
+
+R0 = k.*(1-p)./p;
+Cases =cumsum(repmat(R0,1,Num_Gen).^repmat([0:Num_Gen-1],length(k),1),2);
+norm_pdf=temp_EBD_1_A70.*pdf_1_A70_trim;
+norm_pdf = norm_pdf./repmat(sum(norm_pdf,2),1,Num_Gen);
+Num_Case_Missed_1_A70 =sum(Cases.*norm_pdf,2);
+
+% 90% Ascertainemnt 
+pdf_1_A90 =[sigma_G_1_A90(:,1) diff(sigma_G_1_A90,[],2)];
+pdf_1_A90=pdf_1_A90./repmat(sum(pdf_1_A90,2),1,Num_Gen+1);
+
+pdf_1_A90_trim = pdf_1_A90(:,2:end);
+
+E_1_A90 = sum(theta_G.*pdf_1_A90,2);
+
+temp_EBD_1_A90 = cumsum(theta_G,2).*(1-sigma_G_1_A90);
+temp_EBD_1_A90=temp_EBD_1_A90(:,1:end-1);
+EBD_1_A90 = sum(temp_EBD_1_A90.*pdf_1_A90_trim,2);
+
+R0 = k.*(1-p)./p;
+Cases =cumsum(repmat(R0,1,Num_Gen).^repmat([0:Num_Gen-1],length(k),1),2);
+norm_pdf=temp_EBD_1_A90.*pdf_1_A90_trim;
+norm_pdf = norm_pdf./repmat(sum(norm_pdf,2),1,Num_Gen);
+Num_Case_Missed_1_A90 =sum(Cases.*norm_pdf,2);
 
 close all;
-figure('units','normalized','outerposition',[0.2 0.2 0.4 0.7])
+
+figure('units','normalized','outerposition',[0.2 0.01 0.4 1])
 
 opts = optimoptions("fmincon","Display","none","FunctionTolerance",10^(-9));
 mle_pdf_1 =zeros(11,1);
@@ -155,10 +281,58 @@ mle_pdf_5 =zeros(11,1);
 mle_pdf_10 =zeros(11,1);
 mle_pdf_d1 =zeros(11,1);
 mle_pdf_d1_bnds =zeros(11,2);
+
+mle_pdf_1_A20 =zeros(11,1);
+mle_pdf_1_A30 =zeros(11,1);
+mle_pdf_1_A50 =zeros(11,1);
+mle_pdf_1_A70 =zeros(11,1);
+mle_pdf_1_A40 =zeros(11,1);
+mle_pdf_1_A90 =zeros(11,1);
+xx_temp =linspace(0,1,1001);
 for gg = 0:10
     bp = fitdist(pdf_1(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
     mle_pdf_1(gg+1)= fmincon(@(z)-log(pdf(bp,z)),mean(pdf_1(:,gg+1)),[],[],[],[],0,1,[],opts);
+
+
     if(gg>0)
+        bp = fitdist(pdf_1_A20(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
+        y=pdf(bp,xx_temp);
+        if(max(y)>0 && max(y)~=y(1))
+            mle_pdf_1_A20(gg+1)= fmincon(@(z)-log(pdf(bp,z)),mean(pdf_1_A20(:,gg+1)),[],[],[],[],0,1,[],opts);
+        end
+
+        bp = fitdist(pdf_1_A30(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
+        y=pdf(bp,xx_temp);
+        if(max(y)>0 && max(y)~=y(1))
+            mle_pdf_1_A30(gg+1)= fmincon(@(z)-log(pdf(bp,z)),mean(pdf_1_A30(:,gg+1)),[],[],[],[],0,1,[],opts);
+        end
+    
+
+        bp = fitdist(pdf_1_A40(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
+        y=pdf(bp,xx_temp);
+        if(max(y)>0 && max(y)~=y(1))
+            mle_pdf_1_A40(gg+1)= fmincon(@(z)-log(pdf(bp,z)),mean(pdf_1_A40(:,gg+1)),[],[],[],[],0,1,[],opts);
+        end
+
+        bp = fitdist(pdf_1_A50(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
+        y=pdf(bp,xx_temp);
+        if(max(y)>0 && max(y)~=y(1))
+            mle_pdf_1_A50(gg+1)= fmincon(@(z)-log(pdf(bp,z)),mean(pdf_1_A50(:,gg+1)),[],[],[],[],0,1,[],opts);
+        end
+    
+        bp = fitdist(pdf_1_A70(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
+        y=pdf(bp,xx_temp);
+        if(max(y)>0 && max(y)~=y(1))
+            mle_pdf_1_A70(gg+1)= fmincon(@(z)-log(pdf(bp,z)),mean(pdf_1_A70(:,gg+1)),[],[],[],[],0,1,[],opts);
+        end
+    
+    
+        bp = fitdist(pdf_1_A90(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
+        y=pdf(bp,xx_temp);
+        if(max(y)>0 && max(y)~=y(1))
+            mle_pdf_1_A90(gg+1)= fmincon(@(z)-log(pdf(bp,z)),mean(pdf_1_A90(:,gg+1)),[],[],[],[],0,1,[],opts);
+        end
+
         bp = fitdist(pdf_2(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
         mle_pdf_2(gg+1)= fmincon(@(z)-log(pdf(bp,z)),mean(pdf_2(:,gg+1)),[],[],[],[],0,1,[],opts);
         
@@ -170,6 +344,14 @@ for gg = 0:10
 
         bp = fitdist(pdf_10(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
         mle_pdf_10(gg+1)= fmincon(@(z)-log(pdf(bp,z)),mean(pdf_10(:,gg+1)),[],[],[],[],0,1,[],opts);
+    else
+        mle_pdf_1_A20(gg+1)= mean(pdf_1_A20(:,gg+1));
+        mle_pdf_1_A30(gg+1)= mean(pdf_1_A30(:,gg+1));
+        mle_pdf_1_A40(gg+1)= mean(pdf_1_A40(:,gg+1));
+        mle_pdf_1_A50(gg+1)= mean(pdf_1_A50(:,gg+1));  
+        mle_pdf_1_A70(gg+1)= mean(pdf_1_A70(:,gg+1));
+        mle_pdf_1_A90(gg+1)= mean(pdf_1_A90(:,gg+1));
+
     end
 
     bp = fitdist(pdf_d1(:,gg+1),'Kernel','Support',[-10^(-16) 1]);
@@ -186,7 +368,34 @@ for jj=1:size(pdf_1,1)
         Delay_Detection(jj,ii)= find(r<=cdf_d1,1,"first")-find(r<=cdf_1,1,"first");
     end
 end
-subplot('Position',[0.1 0.08 0.87 0.4])
+subplot('Position',[0.1 0.08 0.87 0.25])
+
+cond_mle_pdf_1_A20 = mle_pdf_1_A20(2:end)./sum(mle_pdf_1_A20(2:end));
+cond_mle_pdf_1_A30 = mle_pdf_1_A30(2:end)./sum(mle_pdf_1_A30(2:end));
+cond_mle_pdf_1_A40 = mle_pdf_1_A40(2:end)./sum(mle_pdf_1_A40(2:end));
+cond_mle_pdf_1_A50 = mle_pdf_1_A50(2:end)./sum(mle_pdf_1_A50(2:end));
+cond_mle_pdf_1_A70 = mle_pdf_1_A70(2:end)./sum(mle_pdf_1_A70(2:end));
+cond_mle_pdf_1_A90 = mle_pdf_1_A90(2:end)./sum(mle_pdf_1_A90(2:end));
+
+plot([1:10],sqrt(cond_mle_pdf_1_A20),'color',hex2rgb('#e41a1c'),'LineWidth',2,'Marker','d','MarkerFaceColor',hex2rgb('#e41a1c')); hold on
+plot([1:10],sqrt(cond_mle_pdf_1_A30),'color',hex2rgb('#377eb8'),'LineWidth',2,'Marker','s','MarkerFaceColor',hex2rgb('#377eb8')); hold on
+plot([1:10],sqrt(cond_mle_pdf_1_A40),'color',hex2rgb('#4daf4a'),'LineWidth',2,'Marker','h','MarkerFaceColor',hex2rgb('#4daf4a')); hold on
+plot([1:10],sqrt(cond_mle_pdf_1_A50),'color',hex2rgb('#984ea3'),'LineWidth',2,'Marker','pentagram','MarkerFaceColor',hex2rgb('#984ea3')); hold on
+plot([1:10],sqrt(cond_mle_pdf_1_A70),'color',hex2rgb('#A3A599'),'LineWidth',2,'Marker','o','MarkerFaceColor',hex2rgb('#A3A599')); hold on
+plot([1:10],sqrt(cond_mle_pdf_1_A90),'color',hex2rgb('#ff7f00'),'LineWidth',2,'Marker','^','MarkerFaceColor',hex2rgb('#ff7f00')); hold on
+
+set(gca,'LineWidth',2,'TickDir','out','XTick',[0:10],'FontSize',12,'Ytick',sqrt([0 0.01 0.05 0.1:.1:1]),'YTickLabel',{num2str([0 0.01 0.05 0.1:.1:1]')})
+box off;
+legend({'20% ascertainment','30% ascertainment','40% ascertainment','50% ascertainment','70% ascertainment','90% ascertainment'},'FontSize',14)
+legend boxoff;
+xlabel('Generation of detection','FontSize',14)
+ylabel('Probability','FontSize',14)
+grid on;
+xlim([1 10])
+ylim([0 1])
+text(-0.1,1,'C','FontSize',28,'Units','normalized')
+
+subplot('Position',[0.1 0.4 0.87 0.25])
 plot([0:6],sqrt(mle_pdf_1(1:7)),'color',hex2rgb('#A3A599'),'LineWidth',2,'Marker','o','MarkerFaceColor',hex2rgb('#A3A599')); hold on
 plot([0:6],sqrt(mle_pdf_d1(1:7)),'color',hex2rgb('#A10115'),'LineWidth',2,'Marker','s','MarkerFaceColor',hex2rgb('#A10115'))
 
@@ -200,7 +409,7 @@ xlim([0 6])
 text(-0.1,1,'B','FontSize',28,'Units','normalized')
 grid on;
 
-subplot('Position',[0.1 0.56 0.87 0.4])
+subplot('Position',[0.1 0.72 0.87 0.25])
 plot([0:10],sqrt(mle_pdf_1),'color',hex2rgb('#A3A599'),'LineWidth',2,'Marker','o','MarkerFaceColor',hex2rgb('#A3A599')); hold on
 plot([0:10],sqrt(mle_pdf_2),'color',hex2rgb('#CE5A57'),'LineWidth',2,'Marker','d','MarkerFaceColor',hex2rgb('#CE5A57')); hold on
 plot([0:10],sqrt(mle_pdf_3),'color',hex2rgb('#78A5A3'),'LineWidth',2,'Marker','pentagram','MarkerFaceColor',hex2rgb('#78A5A3')); hold on
@@ -220,6 +429,29 @@ theme('light')
 
 print(gcf,['Figure_3.png'],'-dpng','-r600');
 
+
+figure('units','normalized','outerposition',[0.2 0.2 0.4 0.45])
+subplot('Position',[0.1 0.14 0.87 0.8])
+
+
+plot([0:10],sqrt(mle_pdf_1_A20),'color',hex2rgb('#e41a1c'),'LineWidth',2,'Marker','d','MarkerFaceColor',hex2rgb('#e41a1c')); hold on
+plot([0:10],sqrt(mle_pdf_1_A30),'color',hex2rgb('#377eb8'),'LineWidth',2,'Marker','s','MarkerFaceColor',hex2rgb('#377eb8')); hold on
+plot([0:10],sqrt(mle_pdf_1_A40),'color',hex2rgb('#4daf4a'),'LineWidth',2,'Marker','h','MarkerFaceColor',hex2rgb('#4daf4a')); hold on
+plot([0:10],sqrt(mle_pdf_1_A50),'color',hex2rgb('#984ea3'),'LineWidth',2,'Marker','pentagram','MarkerFaceColor',hex2rgb('#984ea3')); hold on
+plot([0:10],sqrt(mle_pdf_1_A70),'color',hex2rgb('#A3A599'),'LineWidth',2,'Marker','o','MarkerFaceColor',hex2rgb('#A3A599')); hold on
+plot([0:10],sqrt(mle_pdf_1_A90),'color',hex2rgb('#ff7f00'),'LineWidth',2,'Marker','^','MarkerFaceColor',hex2rgb('#ff7f00')); hold on
+
+set(gca,'LineWidth',2,'TickDir','out','XTick',[0:10],'FontSize',12,'Ytick',sqrt([0 0.01 0.05 0.1:.1:1]),'YTickLabel',{num2str([0 0.01 0.05 0.1:.1:1]')})
+box off;
+legend({'20% ascertainment','30% ascertainment','40% ascertainment','50% ascertainment','70% ascertainment','90% ascertainment'},'FontSize',14)
+legend boxoff;
+xlabel('Generation of detection','FontSize',14)
+ylabel('Probability','FontSize',14)
+grid on;
+xlim([0 10])
+ylim([0 1])
+theme('light')
+print(gcf,['Figure_S7.png'],'-dpng','-r600');
 clc;
 
 % At least one case
@@ -352,3 +584,48 @@ lb = icdf(bp_fit,[0.025 ]);
 ub = icdf(bp_fit,[0.975]);
 
 display(['Average probability of extinction before the ascertainment of at least one death: ' num2str(mle,'%3.2f') ' (95% CrI: ' num2str(lb,'%3.2f') char(8211) num2str(ub,'%3.2f') ')']);
+
+% Generation: 20% Ascertainment 
+Gv=[1:10];
+G_mle = Gv(cond_mle_pdf_1_A20==max(cond_mle_pdf_1_A20));
+G_95 = Gv(find(cumsum(cond_mle_pdf_1_A20)>0.95,1,"first"));
+
+display(['With 20% ascertainment and conditional index not ascertained, the Generation of detection: ' num2str(G_mle,'%d') ' (95 percentile = ' num2str(G_95,'%d') ')']);
+
+% Generation: 30% Ascertainment 
+Gv=[1:10];
+G_mle = Gv(cond_mle_pdf_1_A30==max(cond_mle_pdf_1_A30));
+G_ub = Gv(find(cumsum(cond_mle_pdf_1_A30)>0.95,1,"first"));
+
+display(['With 30% ascertainment and conditional index not ascertained, the Generation of detection: ' num2str(G_mle,'%d') ' (95 percentile = ' num2str(G_95,'%d') ')']);
+
+% Generation: 40% Ascertainment 
+Gv=[1:10];
+G_mle = Gv(cond_mle_pdf_1_A40==max(cond_mle_pdf_1_A40));
+G_95 = Gv(find(cumsum(cond_mle_pdf_1_A40)>0.95,1,"first"));
+
+display(['With 40% ascertainment and conditional index not ascertained, the Generation of detection: ' num2str(G_mle,'%d') ' (95 percentile = ' num2str(G_95,'%d') ')']);
+
+
+% Generation: 50% Ascertainment 
+Gv=[1:10];
+G_mle = Gv(cond_mle_pdf_1_A50==max(cond_mle_pdf_1_A50));
+G_95 = Gv(find(cumsum(cond_mle_pdf_1_A50)>0.95,1,"first"));
+
+display(['With 50% ascertainment and conditional index not ascertained, the Generation of detection: ' num2str(G_mle,'%d') ' (95 percentile = ' num2str(G_95,'%d') ')']);
+
+% Generation: 70% Ascertainment 
+Gv=[1:10];
+G_mle = Gv(cond_mle_pdf_1_A70==max(cond_mle_pdf_1_A70));
+G_95 = Gv(find(cumsum(cond_mle_pdf_1_A70)>0.95,1,"first"));
+
+display(['With 70% ascertainment and conditional index not ascertained, the Generation of detection: ' num2str(G_mle,'%d') ' (95 percentile = ' num2str(G_95,'%d') ')']);
+
+
+% Generation: 90% Ascertainment 
+
+Gv=[1:10];
+G_mle = Gv(cond_mle_pdf_1_A90==max(cond_mle_pdf_1_A90));
+G_95 = Gv(find(cumsum(cond_mle_pdf_1_A90)>0.975,1,"first"));
+
+display(['With 90% ascertainment and conditional index not ascertained, the Generation of detection: ' num2str(G_mle,'%d') ' (95 percentile = ' num2str(G_95,'%d') ')']);
