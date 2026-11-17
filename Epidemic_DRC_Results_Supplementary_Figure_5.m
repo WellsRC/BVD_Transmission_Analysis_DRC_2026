@@ -1,24 +1,7 @@
 clear;
 
 [k_mle,p_mle,cfr_mle,~,~,~,R0_mle,~] = BVD_Parameters(1);
-
-N_Samp=10^4;
-
-% Construct a proxy incidence curve from the historical information 
 rng(20260720)
-for IndxC=1:5
-    for ss=1:IndxC
-        if(ss==1)
-            [Incidence] = Simulate_Branching_Epidemic(k_mle.*ones(N_Samp,1),p_mle.*ones(N_Samp,1),20);
-        else            
-            Incidence = Incidence+Simulate_Branching_Epidemic(k_mle.*ones(N_Samp,1),p_mle.*ones(N_Samp,1),20);
-        end
-    end
-    if(IndxC==1)
-        Incidence_Prev_Approx = Incidence;
-    end
-end
-
 load('Epidemic_Analysis_Likelihood','Lt_Lagged','Lt_Generation');
 
 Indx=[1:5];
@@ -69,6 +52,26 @@ G_f = edges(1:end-1)+0.5;
 G_ref = G_f(N==max(N));
 
 
+N_Samp=10^4;
+
+[N_indx,edges_indx] = histcounts(samp_Indx(:,1),0.5:5.5);
+indx_v = edges_indx(1:end-1)+0.5;
+indx_mle = indx_v(N_indx==max(N_indx));
+
+% Construct a proxy incidence curve from the historical information 
+
+for IndxC=1:5
+    for ss=1:IndxC
+        if(ss==1)
+            [Incidence] = Simulate_Branching_Epidemic(k_mle.*ones(N_Samp,1),p_mle.*ones(N_Samp,1),20);
+        else            
+            Incidence = Incidence+Simulate_Branching_Epidemic(k_mle.*ones(N_Samp,1),p_mle.*ones(N_Samp,1),20);
+        end
+    end
+    if(IndxC==indx_mle)
+        Incidence_Prev_Approx = Incidence;
+    end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DRC Analysis
